@@ -228,7 +228,7 @@ if (token && !activeUser) {
 }
 
 if (!activeUser) {
-  window.location = 'login.html';
+  window.location = 'index.html';
 }
     const userList = document.getElementById('user-list');
     const chatBox = document.getElementById('chat-box');
@@ -308,7 +308,7 @@ savedContacts.forEach(name => {
 
     function logout() {
       localStorage.removeItem('activeUser');
-      window.location = 'login.html';
+      window.location = 'index.html';
     }
 
     function addContactByNumber() {
