@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Obito Sign Up</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body, html {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      background: url('background.jpg') center center / cover no-repeat;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+    }
+
+    .signup-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(255, 255, 255, 0.1);
+      padding: 40px 30px;
+      border-radius: 12px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+      width: 300px;
+      animation: fadeInUp 1s ease forwards;
+      opacity: 0;
+    }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+      }
+    }
+
+    .signup-container h2 {
+      text-align: center;
+      color: #fff;
+      margin-bottom: 25px;
+    }
+
+    .input-box {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .input-box input {
+      width: 100%;
+      padding: 12px 10px;
+      border: none;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+      font-size: 15px;
+      outline: none;
+    }
+
+    .input-box label {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      color: #ccc;
+      font-size: 14px;
+      pointer-events: none;
+      transition: 0.3s;
+    }
+
+    .input-box input:focus + label,
+    .input-box input:not(:placeholder-shown) + label {
+      top: -10px;
+      font-size: 12px;
+      color: #ffa500;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 0 5px;
+      border-radius: 4px;
+    }
+
+    .signup-btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      background-color: #ffa500;
+      color: #1a1a1a;
+      font-weight: bold;
+      font-size: 15px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .signup-btn:hover {
+      background-color: #e69500;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 15px;
+      color: #ddd;
+      font-size: 14px;
+    }
+
+    .footer a {
+      color: #ffa500;
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+
+    #message {
+      text-align: center;
+      margin-bottom: 15px;
+      font-size: 14px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="overlay"></div>
+
+  <div class="signup-container">
+    <h2>Register for ChatWise</h2>
+    <form id="signupForm">
+      <div id="message"></div>
+
+      <div class="input-box">
+        <input type="text" id="newUsername" placeholder=" " required />
+        <label for="newUsername">Username</label>
+      </div>
+
+      <div class="input-box">
+        <input type="password" id="newPassword" placeholder=" " required />
+        <label for="newPassword">Password</label>
+      </div>
+
+      <button class="signup-btn" type="submit">Create Account</button>
+    </form>
+
+    <div class="footer">
+      If you have an account! <a href="login.html">Login here</a>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('signupForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const newUsername = document.getElementById('newUsername').value.trim();
+      const newPassword = document.getElementById('newPassword').value.trim();
+      const messageDiv = document.getElementById('message');
+
+      if (newUsername.length < 3 || newPassword.length < 4) {
+        messageDiv.style.color = 'salmon';
+        messageDiv.textContent = 'Username or Password too short.';
+        return;
+      }
+
+      const newUser = {
+        username: newUsername,
+        password: newPassword
+      };
+
+      localStorage.setItem('user', JSON.stringify(newUser));
+
+      messageDiv.style.color = 'lightgreen';
+      messageDiv.textContent = 'Account created !!';
+
+      setTimeout(() => {
+        window.location.href = 'login.html';
+      }, 1500);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chat Dashboard</title>
+  <style>
+    body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+.dashboard {
+  display: flex;
+  height: 100vh;
+}
+
+.sidebar {
+  width: 250px;
+  background: #343a40;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.sidebar-header {
+  padding: 20px;
+  border-bottom: 1px solid #495057;
+}
+
+.sidebar-header h2 {
+  font-size: 22px;
+  margin: 0;
+  font-weight: bold;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 20px;
+  margin: 0;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.sidebar li {
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  background: #495057;
+  margin-bottom: 8px;
+  transition: background 0.2s;
+}
+
+.sidebar li:hover {
+  background: #6c757d;
+}
+
+.add-contact {
+  padding: 20px;
+  border-top: 1px solid #495057;
+  background-color: #343a40;
+}
+
+.add-contact input {
+  width: 100%;
+  padding: 8px;
+  border: none;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.add-contact button {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid black;
+  background: #0d6efd;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.add-contact button:hover {
+  background: #084298;
+}
+
+.chat-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #f8f9fa;
+}
+
+.chat-header {
+  background: white;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ddd;
+}
+
+.chat-header h3 {
+  margin: 0;
+}
+
+.chat-header button {
+  padding: 8px 15px;
+  background: white;
+  border: 2px solid black;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.chat-header button:hover {
+  background: black;
+  color: white;
+}
+
+.messages {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.message {
+  margin: 10px 0;
+  padding: 10px 15px;
+  border-radius: 15px;
+  max-width: 60%;
+  word-wrap: break-word;
+}
+
+.sent {
+  background: #d1e7dd;
+  align-self: flex-end;
+}
+
+.received {
+  background: #e2e3e5;
+  align-self: flex-start;
+}
+
+#chat-form {
+  display: flex;
+  padding: 15px;
+  background: white;
+  border-top: 1px solid #ddd;
+}
+
+#message-input {
+  flex: 1;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+#chat-form button {
+  padding: 10px 20px;
+  margin-left: 10px;
+  background: white;
+  color: black;
+  border: solid 2px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#chat-form button:hover {
+  background: black;
+  color: white;
+}
+  </style>
+</head>
+<body>
+<div class="dashboard">
+  <aside class="sidebar">
+  <div class="sidebar-header">
+    <h2>Contacts</h2>
+  </div>
+
+  <ul id="user-list"></ul>
+
+  <div class="add-contact">
+    <input type="text" id="contact-number-input" placeholder="Enter contact number" />
+    <button onclick="addContactByNumber()">Add Contact</button>
+  </div>
+</aside>
+
+    <main class="chat-area">
+      <header class="chat-header">
+        <h3 id="chat-with">Select a user</h3>
+        <button onclick="logout()">Logout</button>
+      </header>
+      <div class="messages" id="chat-box"></div>
+      <form id="chat-form">
+        <input type="text" id="message-input" placeholder="Type a message..." required>
+        <button type="submit">Send</button>
+      </form>
+    </main>
+  </div>
+
+  <script>
+
+   const urlParams = new URLSearchParams(window.location.search);
+const token = urlParams.get('token');
+let activeUser = localStorage.getItem('activeUser');
+const users = JSON.parse(localStorage.getItem('registeredUsers')) || [];
+
+if (token && !activeUser) {
+  const matchedUser = users.find(u => u.token === token);
+  if (matchedUser) {
+    activeUser = matchedUser.name;
+    localStorage.setItem('activeUser', activeUser);
+  } else {
+    document.body.innerHTML = `
+      <div style="color: #ffa500; font-family: Arial, sans-serif; text-align: center; margin-top: 20%;">
+        <h1>Register Into The ChatWise.</h1>
+        <p style="margin-top: 10px;">This token is not registered. Please sign up first.</p>
+        <a href="register.html" style="color: white; text-decoration: underline;">Go to Registration</a>
+      </div>
+    `;
+    throw new Error("Unregistered token.");
+  }
+}
+
+if (!activeUser) {
+  window.location = 'login.html';
+}
+    const userList = document.getElementById('user-list');
+    const chatBox = document.getElementById('chat-box');
+    const chatForm = document.getElementById('chat-form');
+    const input = document.getElementById('message-input');
+    const chatWith = document.getElementById('chat-with');
+    let currentContact = null;
+
+   function renderContacts() {
+  userList.innerHTML = '';
+  const savedContacts = JSON.parse(localStorage.getItem(`contacts_${activeUser}`)) || [];
+
+  savedContacts.forEach(name => {
+    const li = document.createElement('li');
+    li.textContent = name;
+    li.onclick = () => switchChat(name);
+    userList.appendChild(li);
+  });
+}
+renderContacts();
+
+    function switchChat(name) {
+      currentContact = name;
+      chatWith.textContent = `Chat with ${name}`;
+      chatBox.innerHTML = '';
+      loadMessages();
+    }
+
+    function loadMessages() {
+      const key = `chat_${activeUser}_${currentContact}`;
+      const messages = JSON.parse(localStorage.getItem(key)) || [];
+const savedContacts = JSON.parse(localStorage.getItem(`contacts_${activeUser}`)) || [];
+
+savedContacts.forEach(name => {
+  const li = document.createElement('li');
+  li.textContent = name;
+  li.onclick = () => switchChat(name);
+  userList.appendChild(li);
+});
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    chatForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!currentContact) return;
+
+      const text = input.value.trim();
+      if (!text) return;
+      const key = `chat_${activeUser}_${currentContact}`;
+      const reverseKey = `chat_${currentContact}_${activeUser}`;
+      const messages = JSON.parse(localStorage.getItem(key)) || [];
+
+      messages.push({ sender: activeUser, text });
+      localStorage.setItem(key, JSON.stringify(messages));
+
+      // Display message
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'message sent';
+      msgDiv.textContent = text;
+      chatBox.appendChild(msgDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+      input.value = '';
+
+      // Dummy reply
+      setTimeout(() => {
+        const reply = { sender: currentContact, text: 'Thanks for your message!' };
+        messages.push(reply);
+        localStorage.setItem(key, JSON.stringify(messages));
+
+        const replyDiv = document.createElement('div');
+        replyDiv.className = 'message received';
+        replyDiv.textContent = reply.text;
+        chatBox.appendChild(replyDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }, 1000);
+    });
+
+    function logout() {
+      localStorage.removeItem('activeUser');
+      window.location = 'login.html';
+    }
+
+    function addContactByNumber() {
+  const numberInput = document.getElementById('contact-number-input');
+  const contactNumber = numberInput.value.trim();
+
+  if (!contactNumber) return alert("Please enter a contact number.");
+
+  // Fetch all registered users with numbers
+  const users = JSON.parse(localStorage.getItem('registeredUsers')) || [];
+
+  // Each user should be stored like: { name, number }
+  const contact = users.find(u => u.number === contactNumber);
+
+  if (!contact) {
+    alert("No user found with that number.");
+    return;
+  }
+
+  if (contact.name === activeUser) {
+    alert("You cannot add yourself.");
+    return;
+  }
+
+  let savedContacts = JSON.parse(localStorage.getItem(`contacts_${activeUser}`)) || [];
+
+  if (savedContacts.includes(contact.name)) {
+    alert("Contact already exists.");
+    return;
+  }
+
+  savedContacts.push(contact.name);
+  localStorage.setItem(`contacts_${activeUser}`, JSON.stringify(savedContacts));
+  numberInput.value = '';
+  renderContacts();
+}
+  </script>
+</body>
+</html>

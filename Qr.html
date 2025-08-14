@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Scan to Login</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+  <style>
+    body {
+      background-color: #121212;
+      color: white;
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    #qr {
+      margin-top: 20px;
+      border: 4px solid #ffa500;
+      border-radius: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Scan QR to Login</h1>
+  <canvas id="qr"></canvas>
+
+  <script>
+    // Secret token to authorize login
+    const token = 'mySecretToken123';
+
+    // Save token to sessionStorage so login page can verify it
+    sessionStorage.setItem('accessToken', token);
+
+    // Build login URL with token param
+    const loginURL = window.location.origin + '/dashboard.html?token=' + token;
+
+    // Generate QR code with login URL
+    new QRious({
+      element: document.getElementById('qr'),
+      value: loginURL,
+      size: 200,
+      background: '#121212',
+      foreground: '#ffa500'
+    });
+  </script>
+
+</body>
+</html>

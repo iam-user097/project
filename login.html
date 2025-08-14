@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login To ChatWise</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body, html {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      background: url('background.jpg') center center / cover no-repeat;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+    }
+
+    .login-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(255, 255, 255, 0.1);
+      padding: 40px 30px;
+      border-radius: 12px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+      width: 300px;
+      animation: fadeInUp 1s ease forwards;
+      opacity: 0;
+    }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+      }
+    }
+
+    .login-container h2 {
+      text-align: center;
+      color: #fff;
+      margin-bottom: 25px;
+    }
+
+    .input-box {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .input-box input {
+      width: 100%;
+      padding: 12px 10px;
+      border: none;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      font-size: 15px;
+      outline: none;
+    }
+
+    .input-box label {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      color: #ccc;
+      font-size: 14px;
+      pointer-events: none;
+      transition: 0.3s;
+    }
+
+    .input-box input:focus + label,
+    .input-box input:not(:placeholder-shown) + label {
+      top: -10px;
+      font-size: 12px;
+      color: #ffa500;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 0 5px;
+      border-radius: 4px;
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      background-color: #ffa500;
+      color: #1a1a1a;
+      font-weight: bold;
+      font-size: 15px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .login-btn:hover {
+      background-color: #e69500;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 15px;
+      color: #ddd;
+      font-size: 14px;
+    }
+
+    .footer a {
+      color: #ffa500;
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+
+    .qr {
+      text-align: center;
+      margin-top: 20px;
+      color: #ffa500;
+    }
+
+    .qr a {
+  color: #ffa500;
+  text-decoration: none;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 8px 15px;       /* Added padding for clickable area */
+  margin: 10px auto;       /* Vertical margin, centered horizontally */
+  display: inline-block;   /* Needed for margin auto to center */
+  transition: all 0.3s ease;
+  border-radius: 4px;      /* Rounded corners */
+  border: 2px solid transparent; /* Initial transparent border for smooth border transition */
+}
+
+.qr a:hover {
+  color: orange;
+  text-decoration: underline;
+  border-color: yellow;           /* Only change border color on hover */
+  background-color: rgba(255, 165, 0, 0.15); /* subtle orange background */
+  box-shadow: 0 0 8px 2px rgba(255, 165, 0, 0.4); /* glowing effect */
+}
+
+    #message {
+      text-align: center;
+      margin-bottom: 15px;
+      font-size: 14px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="overlay"></div>
+
+  <div class="login-container">
+    <h2>Login to ChatWise.</h2>
+    <form id="loginForm">
+      <div id="message"></div>
+
+      <div class="input-box">
+        <input type="text" id="username" placeholder=" " required />
+        <label for="username">Username</label>
+      </div>
+
+      <div class="input-box">
+        <input type="password" id="password" placeholder=" " required />
+        <label for="password">Password</label>
+      </div>
+
+      <button class="login-btn" type="submit">Login</button>
+    </form>
+
+    <div class="footer">
+      If you don't have an account! <a href="signup.html">Register</a>
+      <br>
+    </div>
+    <div class="qr">
+      <a href="Qr.html">Scan QR Code to Login</a>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+     const username = document.getElementById('username').value.trim();
+if (username) {
+  localStorage.setItem('activeUser', username);
+
+  // Add user to contact list if not already there
+  const users = JSON.parse(localStorage.getItem('registeredUsers')) || [];
+  if (!users.includes(username)) {
+    users.push(username);
+    localStorage.setItem('registeredUsers', JSON.stringify(users));
+  }
+
+        setTimeout(() => {
+          window.location.href = 'dashboard.html';
+        }, 1000);
+      } else {
+        messageDiv.style.color = 'salmon';
+        messageDiv.textContent = 'Invalid username or password.';
+      }
+    });
+  </script>
+</body>
+</html>
